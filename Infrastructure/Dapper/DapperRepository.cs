@@ -6,20 +6,22 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Reflection;
 
 namespace Infrastructure.Dapper
 {
     public partial class DapperRepository<T> : IDapperRepository<T> where T : class, new()
     {
-        private readonly static Dictionary<DatabaseType, IDbConnection> dic = new Dictionary<DatabaseType, IDbConnection>
+        private readonly static Dictionary<DatabaseType, Type> dic = new Dictionary<DatabaseType, Type>
         {
-            [DatabaseType.SqlServer] = new SqlConnection(),
-            [DatabaseType.MySQL] = new MySqlConnection(),
-            [DatabaseType.SQLite] = new SqliteConnection()
+            [DatabaseType.SqlServer] = typeof(SqlConnection),
+            [DatabaseType.MySQL] = typeof(MySqlConnection),
+            [DatabaseType.SQLite] = typeof(SqliteConnection)
         };
 
         private readonly DapperOptions _options;
         internal IDbConnection Connection;
+
 
         public DapperRepository(IOptions<DapperOptions> optionsAccessor)
         {
@@ -29,7 +31,8 @@ namespace Infrastructure.Dapper
             }
 
             _options = optionsAccessor.Value;
-            Connection = dic[_options.DatabaseType];
+            Type type = dic[_options.DatabaseType];
+            Connection = Activator.CreateInstance(type) as IDbConnection;
             Connection.ConnectionString = _options.ConnectionString;
         }
 
@@ -37,7 +40,5 @@ namespace Infrastructure.Dapper
         {
             return this.Connection.Insert(entity);
         }
-
-        
     }
 }
