@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Dapper
 {
@@ -14,7 +13,7 @@ namespace Infrastructure.Dapper
     {
         private readonly static Dictionary<DatabaseType, IDbConnection> dic = new Dictionary<DatabaseType, IDbConnection>
         {
-            [DatabaseType.SQLServer] = new SqlConnection(),
+            [DatabaseType.SqlServer] = new SqlConnection(),
             [DatabaseType.MySQL] = new MySqlConnection(),
             [DatabaseType.SQLite] = new SqliteConnection()
         };

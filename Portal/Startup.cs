@@ -38,7 +38,7 @@ namespace Portal
             services.AddDapper(options =>
             {
                 options.ConnectionString = Configuration.GetConnectionString("SqlServerConnectionString");
-                options.DatabaseType = DatabaseType.SQLServer;
+                options.DatabaseType = DatabaseType.SqlServer;
             });
 
             ServiceConfig.RegisterService(Configuration, services);

@@ -10,12 +10,12 @@
         /// <summary>
         /// database type
         /// </summary>
-        public DatabaseType DatabaseType { get; set; } = DatabaseType.SQLServer;
+        public DatabaseType DatabaseType { get; set; } = DatabaseType.SqlServer;
     }
 
     public enum DatabaseType
     {
-        SQLServer,
+        SqlServer,
         MySQL,
         SQLite
     }
