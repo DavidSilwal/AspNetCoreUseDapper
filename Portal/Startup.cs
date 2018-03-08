@@ -2,10 +2,9 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Repository;
-using Repository.Dapper;
-using Service;
-using Service.Impl;
+using Portal.Infrastructure;
+using Infrastructure.Dapper;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Portal
 {
@@ -21,10 +20,28 @@ namespace Portal
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton(Configuration);
-            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-            services.AddScoped<IUserService, UserService>();
             services.AddMvc();
+
+            CookieOptions cookieOptions = new CookieOptions();
+            Configuration.GetSection("CookieOptions").Bind(cookieOptions);
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie(options =>
+            {
+                options.Cookie.Domain = cookieOptions.Domain;
+                options.Cookie.Name = cookieOptions.Name;
+                options.Cookie.Path = cookieOptions.Path;
+            });
+
+            services.AddDapper(options =>
+            {
+                options.ConnectionString = Configuration.GetConnectionString("SqlServerConnectionString");
+                options.DatabaseType = DatabaseType.SQLServer;
+            });
+
+            ServiceConfig.RegisterService(Configuration, services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,11 +59,11 @@ namespace Portal
 
             app.UseStaticFiles();
 
+            app.UseAuthentication();
+
             app.UseMvc(routes =>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                RouteConfig.RegisterRoutes(routes);
             });
         }
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Domain;
+using Microsoft.AspNetCore.Mvc;
 using Portal.Models;
 using Service;
 using System.Diagnostics;
@@ -20,6 +21,11 @@ namespace Portal.Controllers
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
+
+            _userService.Add(new User
+            {
+
+            });
 
             return View();
         }
